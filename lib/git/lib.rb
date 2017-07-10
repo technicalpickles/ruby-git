@@ -395,9 +395,15 @@ module Git
       diff_as_hash('diff-index', treeish)
     end
 
-    def ls_files(location=nil)
+    def ls_files(location=nil, options={})
       hsh = {}
-      command_lines('ls-files', ['--stage', location]).each do |line|
+
+      opts = ['--stage']
+      if options[:revision]
+        opts += ['--revision', options[:revision]]
+      end
+      opts << location
+      command_lines('ls-files', opts).each do |line|
         (info, file) = line.split("\t")
         (mode, sha, stage) = info.split
         file = eval(file) if file =~ /^\".*\"$/ # This takes care of quoted strings returned from git
